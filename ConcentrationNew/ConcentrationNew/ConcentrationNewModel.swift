@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ConcentrationNewModel {
+struct ConcentrationNewModel {
     
     init(numberOfPairsOfCards: Int) {
         assert(numberOfPairsOfCards > 0, "Concentration.init() crash, must have at least 1 pair of cards")
@@ -32,17 +32,22 @@ class ConcentrationNewModel {
         
     private var indexOfOneAndOnlyFaceUpCard: Int? {
         get {
-            var foundIndex: Int?
-            for index in cards.indices {
-                if cards[index].isFaceUp {
-                    if foundIndex == nil {
-                        foundIndex = index
-                    } else {
-                        return nil
-                    }
-                }
-            }
-            return foundIndex
+            return cards.indices.filter { cards[$0].isFaceUp }.oneAndOnly
+            
+            
+//            return faceUpCardIndices.count == 1 ? faceUpCardIndices.first : nil
+            
+//            var foundIndex: Int?
+//            for index in cards.indices {
+//                if cards[index].isFaceUp {
+//                    if foundIndex == nil {
+//                        foundIndex = index
+//                    } else {
+//                        return nil
+//                    }
+//                }
+//            }
+//            return foundIndex
         }
         set(newValue) {
             for index in cards.indices {
@@ -51,13 +56,13 @@ class ConcentrationNewModel {
         }
     }
     
-    func chooseCard(at index: Int) {
+    mutating func chooseCard(at index: Int) {
         assert(cards.indices.contains(index), "Concentration.chooseCard() crash, chosen index not in cards")
         if !cards[index].isMatched {
             // If one card currently is face up
             if let matchedIndex = indexOfOneAndOnlyFaceUpCard, matchedIndex != index {
                 // check if cards match
-                if cards[matchedIndex].identifier == cards[index].identifier {
+                if cards[matchedIndex] == cards[index] {
                     cards[matchedIndex].isMatched = true
                     cards[index].isMatched = true
                     score += 2
@@ -88,7 +93,7 @@ class ConcentrationNewModel {
         flipCount += 1
     }
     
-    func restartGame() {
+    mutating func restartGame() {
         for index in cards.indices {
             cards[index].isFaceUp = false
             cards[index].isMatched = false
@@ -97,5 +102,13 @@ class ConcentrationNewModel {
         flipCount = 0
         score = 0
         cards.shuffle()
+    }
+}
+
+
+extension Collection {
+    var oneAndOnly: Element? {
+        // count and first are Collection methods
+        return count == 1 ? first : nil
     }
 }
