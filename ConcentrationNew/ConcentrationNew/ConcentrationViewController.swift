@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ConcentrationViewController: UIViewController {
     
     // set it only when someone needs it, so that i can use the cardButtons.count. Lazy cannot have didSet
     private lazy var game: ConcentrationNewModel = ConcentrationNewModel(numberOfPairsOfCards: numberOfPairsOfCards)
@@ -58,20 +58,33 @@ class ViewController: UIViewController {
     }
     
     private func updateViewFromModel() {
-        scoreLabel.text = "Score: \(game.score)"
-        updateFlipCountLabel()
-
-        for index in cardButtons.indices {
-            let button = cardButtons[index]
-            let card = game.cards[index]
-            
-            if card.isFaceUp {
-                button.setTitle(emoji(for: card), for: UIControl.State.normal)
-                button.backgroundColor = #colorLiteral(red: 0.9372549057, green: 0.9372549057, blue: 0.9568627477, alpha: 1)
-            } else {
-                button.setTitle("", for: UIControl.State.normal)
-                button.backgroundColor = card.isMatched ? #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0) : #colorLiteral(red: 1, green: 0.6470588235, blue: 0.007843137255, alpha: 1)
+        
+        if cardButtons != nil { // coz when segue, still not set yet! will crash if never check
+            for index in cardButtons.indices {
+                let button = cardButtons[index]
+                let card = game.cards[index]
+                
+                if card.isFaceUp {
+                    button.setTitle(emoji(for: card), for: UIControl.State.normal)
+                    button.backgroundColor = #colorLiteral(red: 0.9372549057, green: 0.9372549057, blue: 0.9568627477, alpha: 1)
+                } else {
+                    button.setTitle("", for: UIControl.State.normal)
+                    button.backgroundColor = card.isMatched ? #colorLiteral(red: 0, green: 0, blue: 0, alpha: 0) : #colorLiteral(red: 1, green: 0.6470588235, blue: 0.007843137255, alpha: 1)
+                }
             }
+            
+            scoreLabel.text = "Score: \(game.score)"
+            updateFlipCountLabel()
+        }
+        
+        
+    }
+    
+    var theme: [String]? {
+        didSet {
+            currentEmojiChoice = theme ?? []
+            emoji = [:]
+            updateViewFromModel()
         }
     }
         
@@ -98,10 +111,10 @@ class ViewController: UIViewController {
 //            return "?"
 //        }
         
-        if emojiThemeChoice == nil {
-            emojiThemeChoice = emojiThemes.count.arc4random
-            currentEmojiChoice = emojiThemes[emojiThemeChoice!]
-        }
+//        if emojiThemeChoice == nil {
+//            emojiThemeChoice = emojiThemes.count.arc4random
+//            currentEmojiChoice = emojiThemes[emojiThemeChoice!]
+//        }
         
         if emoji[card] == nil {
             if currentEmojiChoice.count > 0 {
